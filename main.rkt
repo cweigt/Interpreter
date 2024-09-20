@@ -27,6 +27,5 @@
 
 ;(math-exp (num-exp 1) (op +) (num-exp 2))
 ;(execute '(call (function (x + 1) x) a))
-
 (blaaade-parser '(call (function (x) (x * 2)) a))
 (execute '(call (function (x) (x * 2)) a))
