@@ -4,7 +4,7 @@
 (require "utils.rkt")
 (require "interpret.rkt")
 
-(define var-scope
+(define var-env
   '((a 1) (b 2) (x 5))
   )
 
@@ -12,7 +12,7 @@
 
 (define execute
   (lambda (code)
-    (blaaade-interpreter (blaaade-parser code) var-scope)
+    (blaaade-interpreter (blaaade-parser code) var-env)
     )
   )
 
@@ -27,5 +27,9 @@
 
 ;(math-exp (num-exp 1) (op +) (num-exp 2))
 ;(execute '(call (function (x + 1) x) a))
-(blaaade-parser '(call (function (x) (x * 2)) a))
-(execute '(call (function (x) (x * 2)) a))
+
+;(blaaade-parser '(call (function (x) (x * 2)) a))
+;(execute '(call (function (x) (x * 2)) a))
+
+(blaaade-parser '(ask (a == 1) b x))
+
