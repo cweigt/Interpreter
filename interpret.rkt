@@ -28,12 +28,9 @@
       ((eq? (car parsed-code) 'math-exp) (math-exp-helper parsed-code env))
       ;(ask-exp (boolean-exp (var-exp a) (op ==) (num-exp 1)) (true-exp (var-exp b)) (false-exp (var-exp x)))
       ((eq? (car parsed-code) 'ask-exp)
-       (let ((condition (blaaade-interpreter (cadr parsed-code) env)) ;runs it through the boolean-exp-helper below
-             (true-branch (cadr (caddr parsed-code)))
-             (false-branch (cadr (cadddr parsed-code))))
-         (if condition
-             (blaaade-interpreter true-branch env)
-             (blaaade-interpreter false-branch env))))
+       (if (blaaade-interpreter (cadr parsed-code) env)
+           (blaaade-interpreter (cadr (caddr parsed-code)) env)
+           (blaaade-interpreter (cadr (cadddr parsed-code)) env)))
       ;(boolean-exp (op !) (var-exp a))
       ((and (eq? (car parsed-code) 'boolean-exp)
             (eq? (car (cadr parsed-code)) 'op))
