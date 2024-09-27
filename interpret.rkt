@@ -8,19 +8,40 @@
       ((null? parsed-code) (println "blaaade's interpreter found illegal code."))
       ((eq? (car parsed-code) 'var-exp) (var-exp-helper parsed-code env))
       ((eq? (car parsed-code) 'num-exp) (cadr parsed-code))
-      ((eq? (car parsed-code) 'app-exp)
+      ;(app-exp (func-exp ((parmas x) (params y)) (body-exp (math-exp
+      ;(var-exp x) (op +) (var-exp y)) ((var-exp a) (var-exp b)))
+      ((and (eq? (car parsed-code) 'app-exp)
+            (eq? (length (cadr (cadr parsed-code)))
+            (length (caddr parsed-code))))
        (let
            (
             (local_env
              (cons
-              (list (list (cadr (cadr (cadr parsed-code))) (blaaade-interpreter (caddr parsed-code) env)))
+              (combination
+               (map cadr (cadr (cadr parsed-code)))
+               (map (lambda (x) (blaaade-interpreter x env)) (caddr parsed-code)))
               env))
             )
          (blaaade-interpreter (cadr (caddr (cadr parsed-code))) local_env)
          )
        )
       ((eq? (car parsed-code) 'math-exp) (math-exp-helper parsed-code env))
-      ((eq? (car parsed-code) 'boolean-exp) (boolean-exp-helper parsed-code env))
+      ;(ask-exp (boolean-exp (var-exp a) (op ==) (num-exp 1)) (true-exp (var-exp b)) (false-exp (var-exp x)))
+      ((eq? (car parsed-code) 'ask-exp)
+       (let ((condition (blaaade-interpreter (cadr parsed-code) env)) ;runs it through the boolean-exp-helper below
+             (true-branch (cadr (caddr parsed-code)))
+             (false-branch (cadr (cadddr parsed-code))))
+         (if condition
+             (blaaade-interpreter true-branch env)
+             (blaaade-interpreter false-branch env))))
+      ;(boolean-exp (op !) (var-exp a))
+      ((and (eq? (car parsed-code) 'boolean-exp)
+            (eq? (car (cadr parsed-code)) 'op))
+       (not (blaaade-interpreter (caddr parsed-code) env)))
+      ((and
+        (eq? (car parsed-code) 'boolean-exp)
+        (eq? (car (caddr parsed-code)) 'op))
+        (boolean-exp-helper parsed-code env))
       (else (println "blaaade's interpreter found illegal code."))
       )
     )
@@ -68,7 +89,7 @@
       )
     )
   )
-;(math-exp (num-exp 1) (op +) (num-exp 2))
+;(boolean-exp (num-exp 1) (op >) (num-exp 2))... ignore this dog water comment
 (define boolean-exp-helper
   (lambda (parsed-code env)
     (boolean-helper (cadr (caddr parsed-code))
