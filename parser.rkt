@@ -12,25 +12,32 @@
       ;this is the definition of var-exp
       ((symbol? code) (list 'var-exp code))
       ;this is the definition of functin-exp
-      ;(function (x) x) -> (func-exp (params x) (body-exp (var-exp x))
+      ;(function (x y) x) -> (func-exp ((params x) (params y)) (body-exp (var-exp x))
       ((null? code) (println "blaaade's parser is confused")) ;a grammar check
       ((eq? (car code) 'function)
        (list 'func-exp
-             (list 'params (car (cadr code)))
+             (map (lambda (x) (list 'params x)) (cadr code))
              (list 'body-exp (blaaade-parser (caddr code)))))
       ;this is the definition of app-exp
-      ;(call (function (x) x)) a) -> (app-exp (func-exp (params x) (body-exp (var-exp x)) (var-exp a))
+      ;(call (function (x) x)) (a)) ->
+      ;(app-exp (func-exp (params x) (body-exp (var-exp x)) ((var-exp a))
       ((eq? (car code) 'call)
        (list 'app-exp
              (blaaade-parser (cadr code))
-             (blaaade-parser (caddr code))))
+             (map blaaade-parser (caddr code))))
+      ;(ask (a == 1) b x) -> (ask-exp (boolean-exp (var-exp a) (op ==) (num-exp 1))
+      ; (true-exp (var-exp b))
+      ; (false-exp (var-exp x))
       ((eq? (car code) 'ask)
        (list 'ask-exp
              (blaaade-parser (cadr code))
              (list 'true-exp (blaaade-parser (caddr code)))
-             (list 'false-exp (blaaade-parser (cadddr code))) ))
+             (list 'false-exp (blaaade-parser (cadddr code))))
+       )
       ;this is the definition of math-exp
       ;((1+1) + 2) -> (math-exp (num-exp 1) (op +) (num-exp 2))
+      ((eq? (car code) '!)
+       (list 'boolean-exp (list 'op '!) (blaaade-parser (cadr code))))
       ((math-op? (cadr code))
        (list 'math-exp (blaaade-parser (car code))
              (list 'op (cadr code))
@@ -67,6 +74,9 @@
       ((eq? op '<=) #t)
       ((eq? op '==) #t)
       ((eq? op '!=) #t)
+      ((eq? op '&&) #t)
+      ((eq? op '||) #t)
+      ((eq? op '!) #t)
       (else #f)
       )
     )

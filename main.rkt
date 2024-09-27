@@ -1,14 +1,11 @@
 #lang racket
-
 (require "parser.rkt")
 (require "utils.rkt")
 (require "interpret.rkt")
 
 (define var-env
-  '((a 1) (b 2) (x 5))
+  '(((a 1) (b 2) (x 5)))
   )
-
-
 
 (define execute
   (lambda (code)
@@ -17,19 +14,25 @@
   )
 
 
-;(blaaade-interpreter (blaaade-parser '(call (function (x) x) y)) var-scope)
-;(execute '(call (function (x) x) b))
+;(execute '(call (function (x) (x == 1)) a))
 
-;(blaaade-parser '(call (function (x) x) a))
-;(execute '(call (function (x) x) a))
+;(blaaade-interpreter (blaaade-parser '(1 + 2)) var-scope)
+;(blaaade-parser (x == 1)) -> (boolean-exp (var-exp x) (op ==) (num-exp 1)
 
-;(function-reverse (blaaade-parser '(call (function (x) x) 2)))
+;(ask (a == 1) b x) -> (ask-exp (boolean-exp (var-exp a) (op ==) (num-exp 1))
+;(blaaade-parser '(ask (a == 1) b x))
 
-;(math-exp (num-exp 1) (op +) (num-exp 2))
-;(execute '(call (function (x + 1) x) a))
+(execute '(ask (a == 1) b x))
 
-;(blaaade-parser '(call (function (x) (x * 2)) a))
-;(execute '(call (function (x) (x * 2)) a))
+; (true-exp (var-exp b))
+; (false-exp (var-exp x))
 
-(blaaade-parser '(ask (a == 1) b x))
+;how to make our interpreter accept more than one parameters in func-exp?
+
+
+;(blaaade-parser '(call (function (x y) (x + y)) (a b)))
+
+
+;(app-exp (func-exp ((parmas x) (params y)) (body-exp (math-exp
+;(var-exp x) (op +) (var-exp y)) ((var-exp a) (var-exp b)))
 

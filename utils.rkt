@@ -42,20 +42,16 @@
     )
   )
 
-
-(define function-reverse
-  (lambda (parsed-code)
+;lst1 = (x y z) lst2 = (a b c)) -> ((x a) (y b) (z c))
+(define combination
+  (lambda (lst1 lst2)
     (cond
-      ((null? parsed-code) '())
-      ((equal? (car parsed-code) 'func-exp)
-       (list 'function ;starting list with the word function
-             (list (cadr (cadr parsed-code))) ;get params *x, stays same
-                (cadr (cadr (caddr parsed-code))))) ;second element of list 'function, this is x in the body-exp
-      ((or (equal? (car parsed-code) 'var-exp) (equal? (car parsed-code) 'num-exp)) (cadr parsed-code)) ;should get a/b/c or whatever
-      ((equal? (car parsed-code) 'app-exp)
-       (list 'call
-            (function-reverse (cadr parsed-code)) ;calls on func
-            (function-reverse (caddr parsed-code)))) ;calls on var-exp a
-      (else parsed-code))))
+      ((null? lst1) '())
+      (else (cons
+             (list (car lst1) (car lst2))
+             (combination (cdr lst1) (cdr lst2))))
+      )
+    )
+  )
 
 (provide (all-defined-out))
