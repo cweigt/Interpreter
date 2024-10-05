@@ -28,6 +28,18 @@
       ;(ask (a == 1) b x) -> (ask-exp (boolean-exp (var-exp a) (op ==) (num-exp 1))
       ; (true-exp (var-exp b))
       ; (false-exp (var-exp x))
+      ((eq? (car code) 'out)
+       (list 'out-exp (blaaade-parser (cadr code))))
+      ((and (eq? (car code) 'post)
+            (eq? (caddr code) '=)
+            (eq? (length code) 4))
+       (list 'post-exp
+             (blaaade-parser (cadr code))
+             (blaaade-parser (cadddr code))))
+      ;(queue (post c = 2) c)
+      ;(queue-exp (post-exp (var-exp c) (num-exp 2)) (var-exp c))
+      ((eq? (car code) 'queue)
+       (cons 'queue-exp (map blaaade-parser (cdr code))))
       ((eq? (car code) 'ask)
        (list 'ask-exp
              (blaaade-parser (cadr code))
