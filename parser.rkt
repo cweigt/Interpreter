@@ -36,6 +36,12 @@
        (list 'post-exp
              (blaaade-parser (cadr code))
              (blaaade-parser (cadddr code))))
+      ((and (eq? (car code) 'put)
+            (eq? (caddr code) '=)
+            (eq? (length code) 4))
+       (list 'put-exp
+             (blaaade-parser (cadr code))
+             (blaaade-parser (cadddr code))))
       ;(queue (post c = 2) c)
       ;(queue-exp (post-exp (var-exp c) (num-exp 2)) (var-exp c))
       ((eq? (car code) 'queue)
@@ -46,6 +52,13 @@
              (list 'true-exp (blaaade-parser (caddr code)))
              (list 'false-exp (blaaade-parser (cadddr code))))
        )
+      ;definition of 'wahl-exp
+      ;(wahl-exp (boolean-exp (var-exp a) (op <) (num-exp 10)) (body-exp (queue-exp ((put-exp (var-exp a) (math-exp (var-exp a) (op +) (num-exp 1))) (out-exp a))))
+      ((eq? (car code) 'wahl)
+       (list 'wahl-exp
+             (blaaade-parser (cadr code))
+             (list 'body-exp (blaaade-parser (caddr code)))
+              ))
       ;this is the definition of math-exp
       ;((1+1) + 2) -> (math-exp (num-exp 1) (op +) (num-exp 2))
       ((eq? (car code) '!)

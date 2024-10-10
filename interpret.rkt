@@ -25,37 +25,46 @@
          (blaaade-interpreter (cadr (caddr (cadr parsed-code))) local_env)
          )
        )
+      ;'(wahl-exp (boolean-exp (var-exp a) (op <) (num-exp 10)) (body-exp (queue-exp (put-exp (var-exp a) (math-exp (var-exp a) (op +) (num-exp 1))) (out-exp (var-exp a)))))
+      ((eq? (car parsed-code) 'wahl-exp)
+       (if (blaaade-interpreter (cadr parsed-code) env)
+           ;this is what I'm getting on display
+           ;(queue-exp (queue-exp (put-exp (var-exp a) (math-exp (var-exp a) (op +) (num-exp 1))) (out-exp (var-exp a))))
+             (displayln
+              (cons 'queue-exp (list (cadr (caddr parsed-code)))) )
+ 
+           (println "Condition false: all done")))
+
       ((eq? (car parsed-code) 'out-exp)
        (displayln (blaaade-interpreter (cadr parsed-code) env)))
-      ;(post-exp (var-exp c) (num-exp 2))
-      ;(((f 2))((a 1)(b 2)(x 5))) -> (((c 2)(f 2))((a 1)(b 2)(x 5)))
-      ;for some reason set wasn't working, so I just got rid of it and returned it normally
-      ((eq? (car parsed-code) 'post-exp)
-       (if (env-contains-name? (cadr (cadr parsed-code)) env)
-           (println "Cannot declare used variable.")
-           (let
-               ((new-pair
-           (list
-            (cadr (cadr parsed-code))
-            (blaaade-interpreter (caddr parsed-code) env))))
-             (if (null? env) (list (list new-pair))
-                 (cons (cons new-pair (car env)) (cdr env))
-                 ))))
-      ;(queue-exp exp1 exp2 exp3...)
-      ;execute exp1
-      ;execute (queue-exp exp2 exp3 ...)
-      ;execuete (queue-exp exp_n) = > execute exp_n
-      ;'(queue-exp (post-exp (var-exp c) (num-exp 2)) (var-exp c))
-      ;queue does the real work, new-env is giong to be a call to post-exp to retrieve that upated environment
-      ;then cons together
       ((eq? (car parsed-code) 'queue-exp)
+       ;(queue (post c = 3) (post d = 4)) if next exp is post only, do nothing
+       ;otherwise, execute the next next exp in the new scope
        (cond
-         ((eq? (length parsed-code) 2)
-          (blaaade-interpreter (cadr parsed-code) env))
+         ((and (eq? (length parsed-code) 2) (eq? (car (cadr parsed-code)) 'post-exp))
+          (println "declare without use"))
+         ((and (eq? (length parsed-code) 2) (eq? (car (cadr parsed-code)) 'put-exp))
+          (println "assign without use"))
+         ((and (eq? (length parsed-code) 2)
+               (blaaade-interpreter (cadr parsed-code) env)))
+         ((eq? (car (cadr parsed-code)) 'post-exp)
+          ;case 1: the variable name is in the env, throw error
+          (if (env-contains-name? (cadr (cadr parsed-code)) env)
+           (println "Cannot declare used variable.")
+          ;case 2: add the kvp to the top scope of the env, run the rest of queue
+           (let ((new-env
+                  ;post-exp (var-exp c)(num-exp 3)
+                  (cons (cons (list (cadr (cadr (cadr parsed-code))) (blaaade-interpreter (caddr (cadr parsed-code)) env)) (car env)) (cdr env))))
+             (blaaade-interpreter (cons 'queue-exp (cddr parsed-code)) new-env))))
+         ((eq? (car (cadr parsed-code)) 'put-exp)
+          (if (env-contains-name? (cadr (cadr (cadr parsed-code))) env)
+              (let ((new-env
+                     (put-helper (cadr (cadr (cadr parsed-code))) (blaaade-interpreter (caddr (cadr parsed-code)) env) env)))
+                (blaaade-interpreter (cons 'queue-exp (cddr parsed-code)) new-env))
+              (displayln "variable is not in the env")))    
          (else
-          (let ((new-env (blaaade-interpreter (cadr parsed-code) env)))
-          (blaaade-interpreter (cons 'queue-exp (cddr parsed-code)) new-env)))))
-      
+          (blaaade-interpreter (cadr parsed-code) env)
+          (blaaade-interpreter (cons 'queue-exp (cddr parsed-code)) env))))
       ((eq? (car parsed-code) 'math-exp) (math-exp-helper parsed-code env))
       ;'(ask-exp (boolean-exp (var-exp a) (op ==) (num-exp 1))
       ;(true-exp (var-exp b)) (false-exp (var-exp x)))
@@ -64,6 +73,7 @@
            (blaaade-interpreter (cadr (caddr parsed-code)) env)
            (blaaade-interpreter (cadr (cadddr parsed-code)) env)
            ))
+      
       ;(boolean-exp (op !) (var-exp a))
       ((and (eq? (car parsed-code) 'boolean-exp)
             (eq? (car (cadr parsed-code)) 'op))
