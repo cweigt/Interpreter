@@ -13,16 +13,10 @@
     )
   )
 
-;(call (function (x) (
-;queue
-;(post c = 2)
-;(c)
-;) ((a)))
+;(execute '(queue (post c = 3) (put c = 4) (out c)))
 
-;(que-exp (out-exp (var-exp a)) (out-exp (var-exp b)))
-;(blaaade-parser '(queue (out a) (out b)))
-(execute '(queue (post c = 3) (out c)))
-;post only makes sense in side queue-exp
-;(let ((new_env (defined by post and current env))
-;     (running the rest))
-;post c = 3 is a statement to modify the environment
+
+;(wahl-exp (boolean-exp (var-exp a) (op <) (num-exp 10)) (body-exp (queue-exp ((put-exp (var-exp a) (math-exp (var-exp a) (op +) (num-exp 1))) (out-exp a))))
+;(blaaade-parser '(wahl (a < 10) (queue (put a = (a + 1)) (out a))))
+
+(execute '(wahl (a < 10) (queue (put a = (a + 1)) (out a))))

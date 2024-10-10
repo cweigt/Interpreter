@@ -23,11 +23,20 @@
 ;return true if the scope has the variable name, otherwise return false
 (define scope-contains-name?
   (lambda (varname scope)
-    (
-     cond
+    (cond
       ((null? scope) #f)
       ((eq? (car (car scope)) varname) #t)
       (else (scope-contains-name? varname (cdr scope)))
+      )
+    )
+  )
+
+(define env-contains-name?
+  (lambda (varname env)
+    (cond
+      ((null? env) #f)
+      ((scope-contains-name? varname (car env)) #t)
+      (else (env-contains-name? varname (cdr env)))
       )
     )
   )
@@ -51,6 +60,22 @@
              (list (car lst1) (car lst2))
              (combination (cdr lst1) (cdr lst2))))
       )
+    )
+  )
+
+;env = (((c 4) (d 4)) ((a 1) (b 2) (x 5)))
+;update d = 5
+;results env = (((c 4) (d 4)) ((a 1) (b 5) (x 5)))
+(define put-helper
+  (lambda (varname value env)
+    (cond
+      ((or (null? env) (not (env-contains-name? varname env))) (displayln "variable is not in the env"))
+      ((scope-contains-name? varname (car env))
+       (cons (map (lambda (pair)
+              (if (eq? (car pair) varname) (list varname value)
+                  pair)) (car env)) (cdr env)))
+      (else (cons (car env) (put-helper varname value (cdr env))))
+     )
     )
   )
 
