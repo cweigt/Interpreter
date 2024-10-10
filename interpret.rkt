@@ -30,8 +30,8 @@
        (if (blaaade-interpreter (cadr parsed-code) env)
            ;this is what I'm getting on display
            ;(queue-exp (queue-exp (put-exp (var-exp a) (math-exp (var-exp a) (op +) (num-exp 1))) (out-exp (var-exp a))))
-             (displayln
-              (cons 'queue-exp (list (cadr (caddr parsed-code)))) )
+             (blaaade-interpreter
+              (cons 'queue-exp (list (cadr (caddr parsed-code)))) env)
  
            (println "Condition false: all done")))
 
