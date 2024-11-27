@@ -10,6 +10,7 @@
       ((number? code) (list 'num-exp code))
       ;a symbol is a legit expression
       ((symbol? code) (list 'var-exp code))
+      ((string? code) (list 'str-exp code))
       ;
       ((and (eq? (length code) 2) (symbol? (car code)))
        (cond
@@ -70,6 +71,15 @@
            (parser (caddr code))
            (parser (list 'put (car (cadr code)) '= (cadddr code)))
            (parser (get-list-item code 4)))
+          )
+         ((eq? (car code) 'mike)
+          (cons 'mike-exp (cdr code)))
+         ((eq? (car code) 'new)
+          (list 'new-exp
+               (parser (cadr code))
+               (parser (cadddr code))
+               (map parser (get-list-item code 4))
+               )
           )
        (else
        (cons (parser (car code)) (parser (cdr code))))))

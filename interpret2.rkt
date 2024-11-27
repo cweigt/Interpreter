@@ -8,6 +8,8 @@
        )
       ((eq? (car parsed-code) 'num-exp)
        (list (cadr parsed-code) env))
+      ((eq? (car parsed-code) 'str-exp)
+       (list (cadr parsed-code) env))
       ((eq? (car parsed-code) 'var-exp)
        (list (var-exp-helper parsed-code env) env))
       ((eq? (car parsed-code) 'out-exp)
@@ -94,6 +96,12 @@
           (car exp-result)
           (cdr (cadr exp-result)))
          ))
+      ((eq? (car parsed-code) 'mike-exp)
+       (let*
+           ((new-pair (list (cadr parsed-code) (cddr parsed-code)))
+            (new-env (cons (cons new-pair (car env)) (cdr env))))
+         (list null new-env)
+       ))
       (else
        (if (eq? (car parsed-code) 'return-exp)
            (interpreter (cadr parsed-code) env)
