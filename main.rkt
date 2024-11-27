@@ -13,25 +13,30 @@
     )
   )
 
-;for i = 0; i < 10; i++
-(define code '(josh square (x) (out (x * x))))
-;josh-exp (var-exp square) (func-exp ((var-exp x) (var-exp y) (var-exp z)) (parsed-code))
-;we will create a new key-value pair in the top-most variable scope
-;key = square //function name
-;value = (func-exp ((var-exp x) (var-exp y) (var-exp z)) (parsed-code) //function expression
-;(parser code)
-;(execute code)
+;scope
+;(department = "cs", subject = "language theory", lesson1 = {deparment: deparment...
+;lesson: lesson1
 
-(define code1 '(
-                (josh square (x) (return (x * x)))
-                (put a = (call square (5)))
-                (out a)
-                )
-  
+(define code
+  '(
+    (mike lesson
+         (department subject)
+         (
+          (put (this <- department) = deparment)
+          (put (this <- subject) = subject)
+          )
+         (
+          (talk () (out "we are talk about subject"))
+          (displaySubject () (out subject))
+          )
+         )
+    (new plt = lesson ("CS" "Language Theory"))
+    )
   )
 
+(parser code)
+;(execute code)
+;(null, (((lesson (source code)) rest-of-env)
 
-;(parser code1)
-;(... (return-exp (var-exp 5)))....
-(execute code1)
-;make a return expression
+;(new plt = lesson ("CS" "Language Theory"))
+;(new-exp (var-exp plt) (var-exp lesson) ((str-exp "CS") (str-exp "Language Theory")
